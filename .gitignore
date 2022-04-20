@@ -1,0 +1,31 @@
+# Ignore the node_modules directory
+__pycache__/
+confluent-exercise/
+ctran_data/
+examples/
+trimet_data/
+
+# Ignore Logs
+logs
+*.log
+
+#ignore our project outputs
+*.txt
+*.json
+
+
+# The file containing environment variables 
+.env
+
+# Ignore IDE specific files
+.bash_history/
+.bash_logout/
+.bashrc/
+.lesshst/
+.profile/
+.selected_editor/
+.viminfo/
+.wget-hsts/
+.idea/
+.vscode/
+*.sw*
