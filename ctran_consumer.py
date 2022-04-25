@@ -27,7 +27,8 @@ import json
 import ccloud_lib
 import os
 from datetime import date
-import getpass
+#import getpass
+
 
 
 if __name__ == '__main__':
@@ -52,14 +53,17 @@ if __name__ == '__main__':
     # Process messages
     total_count = 0
     try:
-        username = getpass.getuser()
+        #username = getpass.getuser()
         #username = os.getlogin()
-        path = "/home/" + username + "/InforMetro/ctran_data/"
+        #path = "/home/" + username + "/InforMetro/ctran_data/"
+        # this was causing filepath issues when it relied on a username. Should be the current directory.
+        path = os.getcwd() + "/ctran_data/"
         exists = os.path.exists(path)
         if not exists:
             os.makedirs(path)
-        filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
-        f = open(filename, "w")
+        #filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
+        filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
+        print(filename)
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -72,16 +76,22 @@ if __name__ == '__main__':
             elif msg.error():
                 print('error: {}'.format(msg.error()))
             else:
-                # Check for Kafka message
-                record_key = msg.key()
-                record_value = msg.value()
-                data = json.loads(record_value)
-                count = 500
-                total_count += 1
-                f.write("Consumed record with key {} and value {}, \
-                      and updated total count to {}"
-                      .format(record_key, record_value, total_count))
-                print(total_count)
+                #If there is a message, open a file and write to it until there are no more messages.
+                f = open(filename, "w")
+                while msg is not None:
+                    # Check for Kafka message
+                    record_key = msg.key()
+                    record_value = msg.value()
+                    data = json.loads(record_value)
+                    count = 500
+                    total_count += 1
+                    f.write("Consumed record with key {} and value {}, \
+                        and updated total count to {}"
+                        .format(record_key, record_value, total_count))
+                    #check for more messages before closing.
+                    msg = consumer.poll(1.0)
+                f.close()
+                #print(total_count)
     except KeyboardInterrupt:
         pass
     finally:
@@ -89,4 +99,3 @@ if __name__ == '__main__':
         consumer.close()
         # f.write(total_count)
         # print(total_count)
-        f.close()
