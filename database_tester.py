@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-from database2 import *
+from database import *
 
 dtrip1 = {'trip_id':[169472306],'route_id':[100],'vehicle_id':[100],'service_key':['Sunday'],'direction':['Out']}
 dtrip2 = {'trip_id':[169472307],'route_id':[100],'vehicle_id':[100],'service_key':['Sunday'],'direction':['Out']}
