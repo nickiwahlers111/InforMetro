@@ -105,7 +105,7 @@ if __name__ == '__main__':
                     if result is False:
                         db.insert_trip(conn, trip)
                     db.insert_breadcrumb(conn, breadcrumb)
-                    vd.do_validate(data['count'])
+                    #vd.do_validate(data['count'])
                     total_count += 1
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"

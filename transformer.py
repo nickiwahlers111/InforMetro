@@ -25,6 +25,12 @@ def direction_to_value(direction):
         direction = -1
     return direction
 
+def coordinate_to_value(coordinate):
+    if(coordinate == ""):
+        coordinate = NULL
+    return coordinate
+
+
 ###############################################################################################################################
 
 def transform(data):
@@ -53,6 +59,10 @@ def transform(data):
 
     # Transform blank directions to NULL
     breadcrumb['direction'] = breadcrumb['direction'].apply(direction_to_value)
+
+    # Transform blank latitudes and longitudes to NULL
+    breadcrumb['latitude'] = breadcrumb['latitude'].apply(coordinate_to_value)
+    breadcrumb['longitude'] = breadcrumb['longitude'].apply(coordinate_to_value)
 
     # Transform OPD_DATE and ACT_TIME to a single timestamp
     dates = df['OPD_DATE']
