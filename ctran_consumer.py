@@ -32,6 +32,7 @@ from datetime import date
 import validator as vd
 import utility as util
 import database as db
+import transformer as tf
 
 
 
@@ -69,7 +70,7 @@ if __name__ == '__main__':
         #filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         print(filename)
-        conn = db.open_and_create
+        conn = db.open_and_create()
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -98,6 +99,9 @@ if __name__ == '__main__':
                     #print (data['count']['OPD_DATE'])
                     current_trip_id = util.get_trip_id(data)
                     result = util.is_match(current_trip_id, previous_trip_id)
+
+                    # validator
+                    trip, breadcrumb = tf.transform(data['count'])
                     if result is False:
                         db.insert_trip(conn, trip)
                     db.insert_breadcrumb(conn, breadcrumb)
