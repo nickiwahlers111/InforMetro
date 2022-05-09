@@ -22,6 +22,7 @@
 #
 # =============================================================================
 
+from urllib.parse import non_hierarchical
 from confluent_kafka import Consumer
 import json
 import ccloud_lib
@@ -29,6 +30,8 @@ import os
 from datetime import date
 #import getpass
 import validator as vd
+import utility as util
+import database as db
 
 
 
@@ -53,6 +56,7 @@ if __name__ == '__main__':
 
     # Process messages
     total_count = 0
+    conn = None
     try:
         #username = getpass.getuser()
         #username = os.getlogin()
@@ -65,6 +69,7 @@ if __name__ == '__main__':
         #filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         print(filename)
+        conn = db.open_and_create
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -80,21 +85,29 @@ if __name__ == '__main__':
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
                 f = open(filename, "w")
+                current_trip_id = None
+                previous_trip_id = None
+
                 while msg is not None:
                     # Check for Kafka message
                     record_key = msg.key()
                     record_value = msg.value()
                     data = json.loads(record_value)
-                    count = 500
 
                     #example indexing into 'dict object'
                     #print (data['count']['OPD_DATE'])
+                    current_trip_id = util.get_trip_id(data)
+                    result = util.is_match(current_trip_id, previous_trip_id)
+                    if result is False:
+                        db.insert_trip(conn, trip)
+                    db.insert_breadcrumb(conn, breadcrumb)
                     vd.do_validate(data['count'])
                     total_count += 1
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
                     #check for more messages before closing.
+                    previous_trip_id = current_trip_id
                     msg = consumer.poll(1.0)
                 f.close()
                 #print(total_count)
@@ -103,5 +116,6 @@ if __name__ == '__main__':
     finally:
         # Leave group and commit final offsets
         consumer.close()
+        db.close_db(conn)
         # f.write(total_count)
         # print(total_count)

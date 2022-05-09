@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 
 import json, sys
+from re import A
 from numpy import insert
 import psycopg2
 import subprocess
@@ -51,19 +52,25 @@ def open_and_create():
   return conn
 
 
-def insert_into_table(conn, df_trip, df_bread):
-  
-  dtrip = pd.DataFrame(data=df_trip)
+def insert_breadcrumb(conn, df_bread):
   dbread= pd.DataFrame(data=df_bread)
     # for formats for the insertions
-  formats = (
-    (str(dtrip['trip_id'][0]), str(dtrip['route_id'][0]), str(dtrip['vehicle_id'][0]), str(dtrip['service_key'][0]), str(dtrip['direction'][0]) ),
+  format = (
     (str(dbread['tstamp'][0]), str(dbread['latitude'][0]), str(dbread['longitude'][0]), str(dbread['direction'][0]), str(dbread['speed'][0]), str(dbread['trip_id'][0])) 
   )
+  command = (  "INSERT INTO BreadCrumb VALUES(%s, %s, %s, %s, %s, %s);")
   cur = conn.cursor()
-  for i in range(2):
-    cur.execute(insert_commands[i], formats[i])
+  cur.execute(command, format)
   conn.commit()
+
+def insert_trip(conn, df_trip):
+  dtrip = pd.DataFrame(data=df_trip)
+  format = ((str(dtrip['trip_id'][0]), str(dtrip['route_id'][0]), str(dtrip['vehicle_id'][0]), str(dtrip['service_key'][0]), str(dtrip['direction'][0]) ))
+  command = (  "INSERT INTO Trip VALUES(%s, %s, %s, %s, %s);")
+  cur = conn.cursor()
+  cur.execute(command, format)
+  conn.commit()
+
 
 def close_db(conn):
   if conn is not None:
