@@ -55,7 +55,8 @@ def insert_into_table(conn, df_trip, df_bread):
   
   dtrip = pd.DataFrame(data=df_trip)
   dbread= pd.DataFrame(data=df_bread)
-    # for formats for the insertions
+    
+  # for formats for the insertions
   formats = (
     (str(dtrip['trip_id'][0]), str(dtrip['route_id'][0]), str(dtrip['vehicle_id'][0]), str(dtrip['service_key'][0]), str(dtrip['direction'][0]) ),
     (str(dbread['tstamp'][0]), str(dbread['latitude'][0]), str(dbread['longitude'][0]), str(dbread['direction'][0]), str(dbread['speed'][0]), str(dbread['trip_id'][0])) 

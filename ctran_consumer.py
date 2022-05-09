@@ -27,6 +27,8 @@ import json
 import ccloud_lib
 import os
 from datetime import date
+import transformer as tf
+import database as db
 #import getpass
 
 
@@ -64,6 +66,7 @@ if __name__ == '__main__':
         #filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         print(filename)
+        conn = db.open_and_create()
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -83,19 +86,21 @@ if __name__ == '__main__':
                     record_key = msg.key()
                     record_value = msg.value()
                     data = json.loads(record_value)
-                    count = 500
-                    total_count += 1
+                    print(data)
+                    # something like data = validator.validate(data)
+                    trip, breadcrumb = tf.transform(data) 
+                    print(trip)
+                    print(breadcrumb)
+                    db.insert_into_table(conn, trip, breadcrumb)
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
                     #check for more messages before closing.
                     msg = consumer.poll(1.0)
                 f.close()
-                #print(total_count)
+                db.close_db(conn)
     except KeyboardInterrupt:
         pass
     finally:
         # Leave group and commit final offsets
         consumer.close()
-        # f.write(total_count)
-        # print(total_count)
