@@ -30,6 +30,9 @@ from datetime import date
 import transformer as tf
 import database as db
 #import getpass
+import validator as vd
+import transformer as tf
+import utility as util
 
 
 
@@ -77,30 +80,38 @@ if __name__ == '__main__':
                 print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
-                print('error: {}'.format(msg.error()))
+                x=1
+                #print('error: {}'.format(msg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
                 f = open(filename, "w")
+                current_trip_id = None
+                previous_trip_id = None
                 while msg is not None:
                     # Check for Kafka message
                     record_key = msg.key()
                     record_value = msg.value()
                     data = json.loads(record_value)
-                    print(data)
-                    # something like data = validator.validate(data)
-                    trip, breadcrumb = tf.transform(data) 
-                    print(trip)
-                    print(breadcrumb)
-                    db.insert_into_table(conn, trip, breadcrumb)
+                    count = 500
+
+                    #example indexing into 'dict object'
+                    #print (data['count']['OPD_DATE'])
+                    #vd.do_validate(data['count'])
+                    current_trip_id = util.get_trip_id(data)
+                    result = util.is_match(current_trip_id, previous_trip_id)
+                    if result is False:
+                        db.insert
+                    trip, breadcrumb = tf.transform(data['count'])
+                    total_count += 1
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
                     #check for more messages before closing.
                     msg = consumer.poll(1.0)
                 f.close()
-                db.close_db(conn)
     except KeyboardInterrupt:
         pass
     finally:
         # Leave group and commit final offsets
+        db.close_db(conn)
         consumer.close()

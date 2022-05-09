@@ -11,40 +11,48 @@ def velocity_to_speed(velocity):
 
 # ACT_TIME (NUMBER) from seconds, to h:m:s
 def convert_seconds(time):
-    s = time % 60
-    hold = (time - s) / 60 # leftover minutes
+    t = int(time)
+    s = t % 60
+    hold = (t - s) / 60 # leftover minutes
     m = hold % 60 
     h = (hold - m) / 60
 
     result = '{:d}:{:02d}:{:02d}'.format(int(h),int(m),int(s))
     return result
 
+def direction_to_value(direction):
+    if(direction == ""):
+        direction = -1
+    return direction
+
 ###############################################################################################################################
 
 def transform(data):
-    df = pd.DataFrame.from_dict(data)
+    df = pd.DataFrame([data])
 
     # Breadcrumb: tstamp, latitude, longitude, direction, speed, trip_id
     breadcrumb = df[['OPD_DATE', 'ACT_TIME', 'GPS_LATITUDE', 'GPS_LONGITUDE', 'DIRECTION', 'VELOCITY', 'EVENT_NO_TRIP']].rename({
         'OPD_DATE':'date', 'ACT_TIME':'time', 'GPS_LATITUDE':'latitude', 'GPS_LONGITUDE':'longitude', 'DIRECTION':'direction', 
-        'VELOCITY':'speed', 'EVENT_NO_TRIP':'trip_id'}, axis=1
-    )
-
+        'VELOCITY':'speed', 'EVENT_NO_TRIP':'trip_id'}, axis=1)
+    
     # Trip: trip_id, route_id, vehicle_id, service_key, direction
     trip = df[['EVENT_NO_TRIP', 'VEHICLE_ID']].rename({
         'EVENT_NO_TRIP':'trip_id', 'VEHICLE_ID':'vehicle_id'}, axis=1
     )
-
+    
     # NOTE: We do not have enough information to populate route_id, service_key, or direction yet.
     # Set to null for now (Project Assignment 2)
-    trip['route_id'] = " "
-    trip['service_key'] = " "
-    trip['direction'] = " "
+    trip['route_id'] = -1
+    trip['service_key'] = 'Weekday'
+    trip['direction'] = 'Out'
 
     # Transform velocity (m/s) to speed (mph)
     velocity_df = df['VELOCITY']
     speeds = velocity_df.apply(velocity_to_speed)
     breadcrumb['speed'] = speeds
+
+    # Transform blank directions to NULL
+    breadcrumb['direction'] = breadcrumb['direction'].apply(direction_to_value)
 
     # Transform OPD_DATE and ACT_TIME to a single timestamp
     dates = df['OPD_DATE']
