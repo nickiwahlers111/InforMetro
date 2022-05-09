@@ -28,6 +28,7 @@ import ccloud_lib
 import os
 from datetime import date
 #import getpass
+import validator as vd
 
 
 
@@ -74,7 +75,8 @@ if __name__ == '__main__':
                 print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
-                print('error: {}'.format(msg.error()))
+                x=1
+                #print('error: {}'.format(msg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
                 f = open(filename, "w")
@@ -84,6 +86,10 @@ if __name__ == '__main__':
                     record_value = msg.value()
                     data = json.loads(record_value)
                     count = 500
+
+                    #example indexing into 'dict object'
+                    #print (data['count']['OPD_DATE'])
+                    vd.do_validate(data['count'])
                     total_count += 1
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
