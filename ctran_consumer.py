@@ -61,16 +61,13 @@ if __name__ == '__main__':
     conn = None
     my_list = list()
     try:
-        #username = getpass.getuser()
-        #username = os.getlogin()
-        #path = "/home/" + username + "/InforMetro/ctran_data/"
-        # this was causing filepath issues when it relied on a username. Should be the current directory.
         path = os.getcwd() + "/ctran_data/"
         exists = os.path.exists(path)
         if not exists:
             os.makedirs(path)
-        #filename = "/home/" + username + "/InforMetro/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
+        
         filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
+        
         print(filename)
         conn = db.open_and_create()
         while True:
@@ -84,7 +81,7 @@ if __name__ == '__main__':
                 continue
             elif msg.error():
                 x=1
-                #print('error: {}'.format(msg.error()))
+                #print('error: {}'.format(ddmsg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
                 f = open(filename, "w")
@@ -97,11 +94,11 @@ if __name__ == '__main__':
                     record_value = msg.value()
                     data = json.loads(record_value)
                     input = data['count']
-                    vd.do_validate(input) 
+                    # vd.do_validate(input) 
                     my_list.append(data['count']) 
 
                     total_count+=1
-                    # print(total_count)
+                   
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
@@ -110,16 +107,15 @@ if __name__ == '__main__':
                     msg = consumer.poll(1.0)
                 f.close()
                 df = pd.DataFrame.from_records(my_list)
-                # print(df.head(10))
+                
                 
                 trip, breadcrumb = tf.transform(df)
                 
                 trip.to_csv("trip.csv", sep = ',', index=False)
                 breadcrumb.to_csv("breadcrumb.csv", sep = ',', index=False)
-                
-                # print(trip.head(10))
+                print(total_count) 
                 db.insert_csv(conn)
-                #print(total_count)
+               
     except KeyboardInterrupt:
         pass
     finally:
