@@ -16,8 +16,8 @@ commands = (
   "create type service_type as enum ('Weekday', 'Saturday', 'Sunday');",
   "create type tripdir_type as enum ('Out', 'Back');",
   "create table Trip (trip_id integer, \
-                      route_id integer, \
                       vehicle_id integer, \
+                      route_id integer, \
                       service_key service_type, \
                       direction tripdir_type);",
   "create table BreadCrumb (latitude float, \
@@ -33,7 +33,7 @@ insert_commands = (
   "INSERT INTO BreadCrumb VALUES(%s, %s, %s, %s, %s, %s);",
 )
  
-db_name = 'db2test'
+db_name = 'informetro'
 conn = None
 
 def open_and_create():
