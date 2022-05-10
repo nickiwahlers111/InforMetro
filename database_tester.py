@@ -22,8 +22,11 @@ tripframe.append(dtrip3)
 print("Calling database_stuff!\n")
 
 conn = open_and_create()
-for i in range(3):
-  insert_into_table(conn, tripframe[i], breadframe[i])
+# for i in range(3):
+#   insert_trip(conn, tripframe[i])
+#   insert_breadcrumb(conn, breadframe[i])
+insert_csv(conn)
+
 
 close_db(conn)
 

@@ -19,15 +19,13 @@ commands = (
                       route_id integer, \
                       vehicle_id integer, \
                       service_key service_type, \
-                      direction tripdir_type, \
-                      PRIMARY KEY (trip_id));",
-  "create table BreadCrumb ( tstamp timestamp, \
-                            latitude float, \
+                      direction tripdir_type);",
+  "create table BreadCrumb (latitude float, \
                             longitude float,\
                             direction integer,\
                             speed float,\
                             trip_id integer,\
-                            FOREIGN KEY (trip_id) REFERENCES Trip);",
+                            tstamp timestamp);",
 )
 #commands to insert into tables
 insert_commands = (
@@ -52,26 +50,28 @@ def open_and_create():
   return conn
 
 
-def insert_breadcrumb(conn, df_bread):
-  dbread= pd.DataFrame(data=df_bread)
-    # for formats for the insertions
-  format = (
-    (str(dbread['tstamp'][0]), str(dbread['latitude'][0]), str(dbread['longitude'][0]), str(dbread['direction'][0]), str(dbread['speed'][0]), str(dbread['trip_id'][0])) 
-  )
-  command = (  "INSERT INTO BreadCrumb VALUES(%s, %s, %s, %s, %s, %s);")
+def insert_csv(conn):
+ 
   cur = conn.cursor()
-  cur.execute(command, format)
+  with open('trip.csv', 'r') as f:
+    next(f)
+    cur.copy_from(f, 'trip', sep = ',')
+  with open('breadcrumb.csv', 'r') as f:
+    next(f)
+    cur.copy_from(f, 'breadcrumb', sep = ',')
   conn.commit()
 
-def insert_trip(conn, df_trip):
-  dtrip = pd.DataFrame(data=df_trip)
-  format = ((str(dtrip['trip_id'][0]), str(dtrip['route_id'][0]), str(dtrip['vehicle_id'][0]), str(dtrip['service_key'][0]), str(dtrip['direction'][0]) ))
-  command = (  "INSERT INTO Trip VALUES(%s, %s, %s, %s, %s);")
+
+def add_keys(conn):
+  commands = ("ALTER TABLE trip ADD PRIMARY KEY(trip_id)",\
+              "ALTER TABLE breadcrumb ADD FOREIGN KEY(trip_id) REFERENCES trip")
   cur = conn.cursor()
-  cur.execute(command, format)
-  conn.commit()
+  for c in commands:
+    cur.execute(c)
 
 
 def close_db(conn):
   if conn is not None:
+    # add_keys(conn)
+    conn.commit()
     conn.close()

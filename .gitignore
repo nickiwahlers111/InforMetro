@@ -12,6 +12,7 @@ logs
 #ignore our project outputs
 *.txt
 *.json
+*.csv
 
 
 # The file containing environment variables 
