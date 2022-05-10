@@ -1,3 +1,4 @@
+from re import A
 import pandas as pd
 
 # Transforming VELOCITY (m/s) to Speed (mph)
@@ -16,7 +17,8 @@ def convert_seconds(time):
     hold = (t - s) / 60 # leftover minutes
     m = hold % 60 
     h = (hold - m) / 60
-
+    if h >= 24:
+        h=h-24
     result = '{:d}:{:02d}:{:02d}'.format(int(h),int(m),int(s))
     return result
 
@@ -27,14 +29,15 @@ def direction_to_value(direction):
 
 def coordinate_to_value(coordinate):
     if(coordinate == ""):
-        coordinate = NULL
+        coordinate = -1
     return coordinate
 
 
 ###############################################################################################################################
 
 def transform(data):
-    df = pd.DataFrame([data])
+    # df = pd.DataFrame([data])
+    df = data
 
     # Breadcrumb: tstamp, latitude, longitude, direction, speed, trip_id
     breadcrumb = df[['OPD_DATE', 'ACT_TIME', 'GPS_LATITUDE', 'GPS_LONGITUDE', 'DIRECTION', 'VELOCITY', 'EVENT_NO_TRIP']].rename({
@@ -65,10 +68,12 @@ def transform(data):
     breadcrumb['longitude'] = breadcrumb['longitude'].apply(coordinate_to_value)
 
     # Transform OPD_DATE and ACT_TIME to a single timestamp
+
     dates = df['OPD_DATE']
     times = df['ACT_TIME']
-    times = times.apply(convert_seconds)
+    times = times.apply(convert_seconds)       
     datetimes = pd.concat([dates, times], axis=1)
+
     datetimes['time_stamp'] = datetimes['OPD_DATE'] + ' ' + datetimes['ACT_TIME']
     breadcrumb['tstamp'] = datetimes['time_stamp']
     breadcrumb = breadcrumb.drop(columns=['date', 'time'])

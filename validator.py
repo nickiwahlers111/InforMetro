@@ -5,7 +5,6 @@ import pandas as pd
 # (i.e. Velocity should not exceed 36m/s)
 def reasonable_velocity_value(velocity):
     if int(velocity) > 36:
-        print("ASSERTION FAILED: Velocity exceeds reasonable value.\n")
         return False
     return True
 
@@ -20,12 +19,11 @@ def velocity_not_blank(velocity):
 # Latitude: -90 to 90 latitude
 def latitude_within_range(lat):
     if lat == '':
-        print("ASSERTION FAILED: Latitude is blank.")
         return False
     Lat = float(lat)
     if(Lat >= -90 and Lat <= 90):
         return True
-    print("ASSERTION FAILED: Latitude not within bounds of Earth.\n")
+   
     return False
 
 # Every bus’s recorded GPS coordinates are on Earth.
@@ -44,7 +42,6 @@ def longitude_within_range(long):
 # (i.e. The actual time after midnight should not exceed 86400 seconds).
 def reasonable_total_time(time):
     if int(time) > 86400:
-       print("ASSERTION FAILED: Time exceeds a full day.\n") 
        return False
     return True
 
@@ -70,7 +67,7 @@ def correct_direction_value(direction):
     
     my_direction = int(direction)
     if my_direction > 359 and my_direction < 0:
-        print("ASSERTION FAILED: direction outside direction bounds")
+       
         return False
     return True
 
@@ -79,7 +76,6 @@ def correct_direction_value(direction):
 # Every bus has a trip ID.
 def has_trip_id(id):
     if id is None:
-        print("ASSERTION FAILED: ID is blank")
         return False
     else: 
         return True
@@ -90,7 +86,7 @@ def reasonable_schedule_deviation(seconds):
         print("ASSERTION FAILED: SCHEDULE_DEVIATION is blank")
         return False
     if abs(int(seconds)) >3600:
-        print("ASSERTION FAILED: Schedule deviation is greater than an hour")
+        
         return False
     return True
 
@@ -98,23 +94,38 @@ def reasonable_schedule_deviation(seconds):
 #Each bus has an operation date
 def has_op_date(op_date):
     if op_date == '':
-        print("ASSERTION FAILED: Operation date is empty")
+        return False
+    else:
+        return True
+
+def has_GPS_HDOP(hdop):
+    if hdop == '':
+
         return False
     else:
         return True
 
 
-
-
 def do_validate(breadcrumb):
     breadcrumb['VELOCITY'] = velocity_not_blank(breadcrumb['VELOCITY'])
-    breadcrumb['VELOCITY'] = reasonable_velocity_value(breadcrumb['VELOCITY'])
-    breadcrumb['GPS_LATITUDE'] = latitude_within_range(breadcrumb['GPS_LATITUDE'])
-    breadcrumb['GPS_LONGUTUDE'] = longitude_within_range(breadcrumb['GPS_LATITUDE'])
-    breadcrumb['ACT_TIME'] = reasonable_total_time(breadcrumb['ACT_TIME'])
+    if not reasonable_velocity_value(breadcrumb['VELOCITY']):
+        print("ASSERTION FAILED: Velocity exceeds reasonable value.\n")
+    if not latitude_within_range(breadcrumb['GPS_LATITUDE']):
+         print("ASSERTION FAILED: Latitude not within bounds of Earth.\n")
+    if not longitude_within_range(breadcrumb['GPS_LATITUDE']):
+        print("ASSERTION FAILED: Longitude not within bounds of Earth.\n")
+    if not reasonable_total_time(breadcrumb['ACT_TIME']):
+         print("ASSERTION FAILED: Time exceeds a full day.\n") 
     #breadcrumb[''] = (breadcrumb['']) reasonable bus count
-    breadcrumb['DIRECTION'] = correct_direction_value(breadcrumb['DIRECTION'])
-    breadcrumb['EVENT_NO_TRIP'] = has_trip_id(breadcrumb['EVENT_NO_TRIP'])
-    breadcrumb['EVENT_NO_TRIP'] = reasonable_schedule_deviation(breadcrumb['EVENT_NO_TRIP'])
-    breadcrumb['OPD_DATE'] = has_op_date(breadcrumb['OPD_DATE'])
+    if not correct_direction_value(breadcrumb['DIRECTION']):
+         print("ASSERTION FAILED: direction outside direction bounds")
+    if not has_trip_id(breadcrumb['EVENT_NO_TRIP']):
+        print("ASSERTION FAILED: ID is blank")
+    if not reasonable_schedule_deviation(breadcrumb['EVENT_NO_TRIP']):
+        print("ASSERTION FAILED: Schedule deviation is greater than an hour")
+    if not has_op_date(breadcrumb['OPD_DATE']):
+        print("ASSERTION FAILED: Operation date is empty")
+    if not has_GPS_HDOP(breadcrumb['GPS_HDOP']):
+        print("ASSERTION FAILED: GPD HDOP is empty")
+
 

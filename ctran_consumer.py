@@ -33,6 +33,7 @@ import validator as vd
 import utility as util
 import database as db
 import transformer as tf
+import pandas as pd
 
 
 
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     # Process messages
     total_count = 0
     conn = None
+    my_list = list()
     try:
         #username = getpass.getuser()
         #username = os.getlogin()
@@ -94,19 +96,12 @@ if __name__ == '__main__':
                     record_key = msg.key()
                     record_value = msg.value()
                     data = json.loads(record_value)
+                    input = data['count']
+                    vd.do_validate(input) 
+                    my_list.append(data['count']) 
 
-                    #example indexing into 'dict object'
-                    #print (data['count']['OPD_DATE'])
-                    current_trip_id = util.get_trip_id(data)
-                    result = util.is_match(current_trip_id, previous_trip_id)
-
-                    # validator
-                    trip, breadcrumb = tf.transform(data['count'])
-                    if result is False:
-                        db.insert_trip(conn, trip)
-                    db.insert_breadcrumb(conn, breadcrumb)
-                    #vd.do_validate(data['count'])
-                    total_count += 1
+                    total_count+=1
+                    # print(total_count)
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
@@ -114,12 +109,26 @@ if __name__ == '__main__':
                     previous_trip_id = current_trip_id
                     msg = consumer.poll(1.0)
                 f.close()
+                df = pd.DataFrame.from_records(my_list)
+                # print(df.head(10))
+                
+                trip, breadcrumb = tf.transform(df)
+                
+                trip.to_csv("trip.csv", sep = ',', index=False)
+                breadcrumb.to_csv("breadcrumb.csv", sep = ',', index=False)
+                
+                # print(trip.head(10))
+                db.insert_csv(conn)
                 #print(total_count)
     except KeyboardInterrupt:
         pass
     finally:
         # Leave group and commit final offsets
+
+        ##write to CSV
+        #call insert_db(csv file)
         consumer.close()
+       
         db.close_db(conn)
         # f.write(total_count)
         # print(total_count)
