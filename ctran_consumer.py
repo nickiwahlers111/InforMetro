@@ -107,7 +107,8 @@ if __name__ == '__main__':
                     msg = consumer.poll(1.0)
                 f.close()
                 df = pd.DataFrame.from_records(my_list)
-                
+                #integrate stop data with trip data, 
+                #transform  
                 
                 trip, breadcrumb = tf.transform(df)
                 
