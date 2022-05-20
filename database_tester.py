@@ -2,9 +2,9 @@
 
 from database import *
 
-dtrip1 = {'trip_id':[169472306],'route_id':[100],'vehicle_id':[100],'service_key':['Sunday'],'direction':['Out']}
-dtrip2 = {'trip_id':[169472307],'route_id':[100],'vehicle_id':[101],'service_key':['Sunday'],'direction':['Out']}
-dtrip3 = {'trip_id':[169472308],'route_id':[100],'vehicle_id':[101],'service_key':['Sunday'],'direction':['Out']}
+dtrip1 = {'trip_id':[169472306],'route_id':[],'vehicle_id':[100],'service_key':['Sunday'],'direction':['Out']}
+dtrip2 = {'trip_id':[169472307],'route_id':[],'vehicle_id':[101],'service_key':['Sunday'],'direction':['Out']}
+dtrip3 = {'trip_id':[169472308],'route_id':[],'vehicle_id':[101],'service_key':['Sunday'],'direction':['Out']}
 
 dbread1 = {'tstamp':["2022-05-04 14:30:25"], 'latitude': [45.631987], 'longitude': [-122.640735], 'direction': [11], 'speed':[11], 'trip_id':[169472306] }
 dbread2 = {'tstamp':["2022-05-04 14:00:00"], 'latitude': [45.631987], 'longitude': [-122.640735], 'direction': [11], 'speed':[11], 'trip_id':[169472307] }
@@ -25,7 +25,9 @@ conn = open_and_create()
 # for i in range(3):
 #   insert_trip(conn, tripframe[i])
 #   insert_breadcrumb(conn, breadframe[i])
+# insert_csv(conn)
 insert_csv(conn)
+merge_tables(conn)
 
 
 close_db(conn)

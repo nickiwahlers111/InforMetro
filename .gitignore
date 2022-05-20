@@ -30,3 +30,5 @@ logs
 .idea/
 .vscode/
 *.sw*
+run_cons.sh
+run_prod.sh
