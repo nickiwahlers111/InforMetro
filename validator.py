@@ -129,3 +129,32 @@ def do_validate(breadcrumb):
         print("ASSERTION FAILED: GPD HDOP is empty")
 
 
+
+
+def validate_vehicle_number(vn):
+    if vn == '':
+        return False
+    return True
+
+def validate_route_number(rn):
+    if rn == '':
+        return False
+    return True
+
+def validate_direction(d):
+    if d != '0' and d != '1':
+        return False
+    return True
+
+def validate_service_key(sk):
+    if sk != 'W' and sk != 'U' and sk != 'A' and sk != 'H':
+        return False
+    return True
+
+def validate_stop_event(stopevent):
+    if(validate_vehicle_number(stopevent['vehicle_number']) and
+    validate_route_number(stopevent['route_number']) and
+    validate_direction(stopevent['direction']) and
+    validate_service_key(stopevent['service_key'])):
+        return True
+    return False

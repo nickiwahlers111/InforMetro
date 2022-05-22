@@ -40,13 +40,13 @@ def main(args):
             print("Failed to deliver message: {}".format(err))
         else:
             delivered_records += 1
+            """
             print("Produced record to topic {} partition [{}] @ offset {}"
                   .format(msg.topic(), msg.partition(), msg.offset()))
-
+            """
 
     stop_data = gs.get_stop_data()
-    count = 0
-    """
+    
     username = getpass.getuser()
     path = "/home/" + username + "/InforMetro/stop_data/" 
     exists = os.path.exists(path)
@@ -54,18 +54,20 @@ def main(args):
       os.makedirs(path)
     filename = "/home/" + username + "/InforMetro/stop_data/" + date.today().strftime('%m-%d-%Y') + ".json"
     f = open(filename, "w")
-    f.write(stop_data.text)
-    """
+    f.write(json.dumps(stop_data, indent=4, sort_keys=True))
+    
+    count = 0
     for i in stop_data:
         record_key = "nicki"
         record_value = json.dumps(i)
-        print("Producing record: \t{}".format(count))
         producer.produce(topic, key=record_key, value=record_value, on_delivery=acked)
-        ++count
+        count += 1
         # from previous produce() calls.
         producer.poll(0)
       
     producer.flush()
+
+    print("Produced {} records.".format(count))
 
 
 if __name__ == '__main__':

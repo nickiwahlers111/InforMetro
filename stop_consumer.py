@@ -28,10 +28,10 @@ import json
 import ccloud_lib
 import os
 from datetime import date
-#import validator as vd
+import validator as vd
 import utility as util
 import database as db
-#import transformer as tf
+import transformer as tf
 import pandas as pd
 
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     # Process messages
     total_count = 0
-    conn = None
+    #conn = None
     my_list = list()
     try:
         path = os.getcwd() + "/stop_data/"
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         
         filename = os.getcwd() + "/stop_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         
-        print(filename)
+        #print(filename)
 
         #conn = db.open_and_create()
 
@@ -81,36 +81,32 @@ if __name__ == '__main__':
                 print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
-                x=1
-                #print('error: {}'.format(ddmsg.error()))
+                print('error: {}'.format(ddmsg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
-                f = open(filename, "w")
-
+                #f = open(filename, "w")
                 while msg is not None:
                     # Check for Kafka message
                     record_key = msg.key()
                     record_value = msg.value()
-                    #data = json.loads(record_value)
-                    #input = data['count']
-                    #my_list.append(data['count']) 
+                    data = json.loads(record_value)
+                    if vd.validate_stop_event(data):
+                        my_list.append(data) 
 
                     total_count+=1
                    
-                    print("Consumed record with key {} and value {}, \
-                        and updated total count to {}"
-                        .format(record_key, record_value, total_count))
                     #check for more messages before closing.
                     msg = consumer.poll(1.0)
 
-                f.close()
+                #f.close()
+                
+                df = pd.DataFrame.from_records(my_list)
+                stop_data = tf.transform_stop_event(df) 
+                stop_data.to_csv("stop_data.csv", sep = ',', index=False)
 
-                #df = pd.DataFrame.from_records(my_list)
-                #stop_data = (some validate+transform stuff)
-                #stop_data.to_csv("stop_data.csv", sep = ',', index=False)
-
-                print(total_count) 
                 #db.insert_csv(conn)
+
+                print("Consumed {} records.".format(total_count))
                
     except KeyboardInterrupt:
         pass

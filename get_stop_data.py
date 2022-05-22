@@ -90,7 +90,11 @@ def get_stop_data():
 
     # Remove the closing bracket for cells in the schedule_status col.
     df7['schedule_status'] = df7['schedule_status'].str.strip(']')
-    #print(df7.head(20))
+
+    df7['direction'] = df7['direction'].str.strip()
+    df7['service_key'] = df7['service_key'].str.strip()
+    df7['route_number'] = df7['route_number'].str.strip()
+    df7['vehicle_number'] = df7['vehicle_number'].str.strip()
     
     result = df7.to_json(orient = 'records')
     parsed = json.loads(result)
