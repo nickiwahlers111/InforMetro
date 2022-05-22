@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     # Process messages
     total_count = 0
-    #conn = None
+    conn = None
     my_list = list()
     try:
         path = os.getcwd() + "/stop_data/"
@@ -67,10 +67,6 @@ if __name__ == '__main__':
         
         filename = os.getcwd() + "/stop_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         
-        #print(filename)
-
-        #conn = db.open_and_create()
-
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -100,13 +96,15 @@ if __name__ == '__main__':
 
                 #f.close()
                 
+                print("Consumed {} stop event records.".format(total_count))
                 df = pd.DataFrame.from_records(my_list)
                 stop_data = tf.transform_stop_event(df) 
                 stop_data.to_csv("stop_data.csv", sep = ',', index=False)
 
-                #db.insert_csv(conn)
+                conn = db.open_and_connect()
+                db.insert_stop_event(conn)
+                db.merge_tables(conn)
 
-                print("Consumed {} records.".format(total_count))
                
     except KeyboardInterrupt:
         pass
@@ -117,6 +115,6 @@ if __name__ == '__main__':
         #call insert_db(csv file)
         consumer.close()
        
-        #db.close_db(conn)
+        db.close_db(conn)
         # f.write(total_count)
         # print(total_count)

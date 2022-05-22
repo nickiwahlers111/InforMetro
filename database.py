@@ -67,6 +67,18 @@ def open_and_create():
   conn.commit()
   return conn
 
+def open_and_connect():
+  try:
+    conn = psycopg2.connect(dbname=db_name, user='postgres', password='postgres',host= "localhost")
+  except psycopg2.OperationalError as e:
+    # subprocess.run(["sudo", "-u", "postgres", "createdb", db_name ]) 
+    # Create database
+    create_db = "sudo -u postgres createdb {db_name};"
+    subprocess.call(create_db, shell=True)
+    conn = psycopg2.connect(dbname=db_name, user='postgres', password='postgres',host= "localhost")
+
+  return conn
+
 #open the csv file to write from
 #call copy_from method to get info and write into DB
 def insert_csv(conn):
@@ -78,10 +90,15 @@ def insert_csv(conn):
   with open('breadcrumb.csv', 'r') as f:
     next(f)
     cur.copy_from(f, 'breadcrumb', sep = ',')
-  with open('trip_test.csv', 'r') as f:
+  with open('trip.csv', 'r') as f:
     next(f)
     cur.copy_from(f, 'trip', sep = ',',null='')
-  with open('stop_test.csv', 'r') as f:
+  
+  conn.commit()
+
+def insert_stop_event(conn):
+  cur = conn.cursor()
+  with open('stop_data.csv', 'r') as f:
     next(f)
     cur.copy_from(f, 'stop', sep = ',', null='')
   conn.commit()
