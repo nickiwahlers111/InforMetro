@@ -69,7 +69,9 @@ if __name__ == '__main__':
         #filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         
         #print(filename)
+
         conn = db.open_and_create()
+
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -85,18 +87,23 @@ if __name__ == '__main__':
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
                 #f = open(filename, "w")
-                current_trip_id = None
-                previous_trip_id = None
 
+                valid = 0
+                invalid = 0
                 while msg is not None:
                     # Check for Kafka message
                     record_key = msg.key()
                     record_value = msg.value()
                     data = json.loads(record_value)
                     input = data['count']
-                    # vd.do_validate(input) 
                     my_list.append(data['count']) 
-
+                    """
+                    if vd.validate_breadcrumb(input):
+                        my_list.append(data['count']) 
+                        valid += 1
+                    else:
+                        invalid += 1
+                    """
                     total_count+=1
                     """ 
                     f.write("Consumed record with key {} and value {}, \
@@ -104,19 +111,15 @@ if __name__ == '__main__':
                         .format(record_key, record_value, total_count))
                     """
                     #check for more messages before closing.
-                    previous_trip_id = current_trip_id
                     msg = consumer.poll(1.0)
                 #f.close()
                 df = pd.DataFrame.from_records(my_list)
-                #integrate stop data with trip data, 
-                #transform  
-                
                 trip, breadcrumb = tf.transform(df)
                 
                 trip.to_csv("trip.csv", sep = ',', index=False)
                 breadcrumb.to_csv("breadcrumb.csv", sep = ',', index=False)
-                print(total_count) 
                 db.insert_csv(conn)
+                print("Consumed {} breadcrumb records.".format(total_count))
                
     except KeyboardInterrupt:
         pass

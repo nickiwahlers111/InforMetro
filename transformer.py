@@ -50,10 +50,10 @@ def transform(data):
     )
     
     # NOTE: We do not have enough information to populate route_id, service_key, or direction yet.
-    # Set to null for now (Project Assignment 2)
-    trip['route_id'] = -1
-    trip['service_key'] = 'Weekday'
-    trip['direction'] = 'Out'
+    # Set to blank until we integrate the data later down the pipeline.
+    trip['route_id'] = ''
+    trip['service_key'] = ''
+    trip['direction'] = ''
 
     # Transform velocity (m/s) to speed (mph)
     velocity_df = df['VELOCITY']
@@ -87,7 +87,7 @@ def transform_direction(direction):
     if(direction == '0'):
         direction = 'Out'
     else:
-        direction = 'In'
+        direction = 'Back'
     return direction
 
 
