@@ -13,6 +13,8 @@ logs
 *.txt
 *.json
 *.csv
+*.tsv
+*.geojson
 
 
 # The file containing environment variables 

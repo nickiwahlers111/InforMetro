@@ -75,9 +75,9 @@ def insert_csv(conn):
   # with open('trip.csv', 'r') as f:
   #   next(f)
   #   cur.copy_from(f, 'trip', sep = ',')
-  # with open('breadcrumb.csv', 'r') as f:
-  #   next(f)
-  #   cur.copy_from(f, 'breadcrumb', sep = ',')
+  with open('breadcrumb.csv', 'r') as f:
+    next(f)
+    cur.copy_from(f, 'breadcrumb', sep = ',')
   with open('trip_test.csv', 'r') as f:
     next(f)
     cur.copy_from(f, 'trip', sep = ',',null='')
