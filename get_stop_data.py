@@ -99,4 +99,10 @@ def get_stop_data():
     result = df7.to_json(orient = 'records')
     parsed = json.loads(result)
 
+    """
+    filename = "/home/cstick2/InforMetro/stop_data/05-20-2022.json"
+    temp = open(filename, "r")
+    temp2 = json.loads(temp.read())
+    return temp2
+    """
     return parsed

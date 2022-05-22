@@ -65,8 +65,6 @@ if __name__ == '__main__':
         if not exists:
             os.makedirs(path)
         
-        filename = os.getcwd() + "/stop_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
-        
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
@@ -94,8 +92,6 @@ if __name__ == '__main__':
                     #check for more messages before closing.
                     msg = consumer.poll(1.0)
 
-                #f.close()
-                
                 print("Consumed {} stop event records.".format(total_count))
                 df = pd.DataFrame.from_records(my_list)
                 stop_data = tf.transform_stop_event(df) 

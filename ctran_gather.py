@@ -38,8 +38,10 @@ def main(args):
             print("Failed to deliver message: {}".format(err))
         else:
             delivered_records += 1
+            """
             print("Produced record to topic {} partition [{}] @ offset {}"
                   .format(msg.topic(), msg.partition(), msg.offset()))
+            """
 
 
     username = getpass.getuser()
@@ -52,18 +54,20 @@ def main(args):
     f = open(filename, "w")
     f.write(response.text)
 
+    count = 0;
     with open(filename) as f:
       data=json.load(f)
       for i in data:
-        # print(i)
         record_key = "nicki"
         record_value = json.dumps({'count' :i})
-        print("Producing record: {}\t{}".format(record_key, record_value))
+        #print("Producing record: {}\t{}".format(record_key, record_value))
         producer.produce(topic, key=record_key, value=record_value, on_delivery=acked)
         # from previous produce() calls.
         producer.poll(0)
+        count += 1
       
       producer.flush()
+    print("Produced {} breadcrumb records.".format(count))
 
 
 if __name__ == '__main__':

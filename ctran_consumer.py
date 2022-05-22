@@ -66,10 +66,6 @@ if __name__ == '__main__':
         if not exists:
             os.makedirs(path)
         
-        #filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
-        
-        #print(filename)
-
         conn = db.open_and_create()
 
         while True:
@@ -82,14 +78,10 @@ if __name__ == '__main__':
                 print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
-                x=1
-                #print('error: {}'.format(ddmsg.error()))
+                print('error: {}'.format(ddmsg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
-                #f = open(filename, "w")
 
-                valid = 0
-                invalid = 0
                 while msg is not None:
                     # Check for Kafka message
                     record_key = msg.key()
@@ -100,19 +92,11 @@ if __name__ == '__main__':
                     """
                     if vd.validate_breadcrumb(input):
                         my_list.append(data['count']) 
-                        valid += 1
-                    else:
-                        invalid += 1
-                    """
-                    total_count+=1
-                    """ 
-                    f.write("Consumed record with key {} and value {}, \
-                        and updated total count to {}"
-                        .format(record_key, record_value, total_count))
+                        total_count+=1
                     """
                     #check for more messages before closing.
                     msg = consumer.poll(1.0)
-                #f.close()
+
                 df = pd.DataFrame.from_records(my_list)
                 trip, breadcrumb = tf.transform(df)
                 
@@ -126,10 +110,6 @@ if __name__ == '__main__':
     finally:
         # Leave group and commit final offsets
 
-        ##write to CSV
-        #call insert_db(csv file)
         consumer.close()
        
         db.close_db(conn)
-        # f.write(total_count)
-        # print(total_count)

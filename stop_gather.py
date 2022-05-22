@@ -67,7 +67,7 @@ def main(args):
       
     producer.flush()
 
-    print("Produced {} records.".format(count))
+    print("Produced {} stop event records.".format(count))
 
 
 if __name__ == '__main__':
