@@ -41,7 +41,6 @@ def main(args):
             print("Produced record to topic {} partition [{}] @ offset {}"
                   .format(msg.topic(), msg.partition(), msg.offset()))
 
-    
 
     username = getpass.getuser()
     response = requests.get("http://www.psudataeng.com:8000/getBreadCrumbData")

@@ -66,9 +66,9 @@ if __name__ == '__main__':
         if not exists:
             os.makedirs(path)
         
-        filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
+        #filename = os.getcwd() + "/ctran_data/" + date.today().strftime('%m-%d-%Y') + "output.txt"
         
-        print(filename)
+        #print(filename)
         conn = db.open_and_create()
         while True:
             msg = consumer.poll(1.0)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 #print('error: {}'.format(ddmsg.error()))
             else:
                 #If there is a message, open a file and write to it until there are no more messages.
-                f = open(filename, "w")
+                #f = open(filename, "w")
                 current_trip_id = None
                 previous_trip_id = None
 
@@ -98,14 +98,15 @@ if __name__ == '__main__':
                     my_list.append(data['count']) 
 
                     total_count+=1
-                   
+                    """ 
                     f.write("Consumed record with key {} and value {}, \
                         and updated total count to {}"
                         .format(record_key, record_value, total_count))
+                    """
                     #check for more messages before closing.
                     previous_trip_id = current_trip_id
                     msg = consumer.poll(1.0)
-                f.close()
+                #f.close()
                 df = pd.DataFrame.from_records(my_list)
                 #integrate stop data with trip data, 
                 #transform  

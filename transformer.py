@@ -79,3 +79,35 @@ def transform(data):
     breadcrumb = breadcrumb.drop(columns=['date', 'time'])
 
     return trip, breadcrumb
+
+
+###############################################################################################################################
+
+def transform_direction(direction):
+    if(direction == '0'):
+        direction = 'Out'
+    else:
+        direction = 'In'
+    return direction
+
+
+def transform_service_key(key):
+    if(key == 'W'):
+        key = 'Weekday'
+    elif(key == 'A'):
+        key = 'Saturday'
+    else:
+        key = 'Sunday'
+    return key
+
+
+def transform_stop_event(data):
+    df = data
+
+    stopevent = df[['vehicle_number', 'route_number', 'service_key', 'direction']].rename({
+        'vehicle_number':'vehicle_id', 'route_number':'route_id'}, axis = 1)
+
+    stopevent['direction'] = stopevent['direction'].apply(transform_direction)
+    stopevent['service_key'] = stopevent['service_key'].apply(transform_service_key)
+
+    return stopevent
